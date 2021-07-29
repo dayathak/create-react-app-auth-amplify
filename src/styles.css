@@ -454,11 +454,12 @@
   /* Tables
   ––––––––––––––––––––––––––––––––– */
   table {
-    width: 100%;
+    width: 40%;
     border-spacing: 0;
     margin-bottom: 1.563rem;
     font-variant-numeric: tabular-nums;
   }
+
   
   th,
   td {
@@ -468,7 +469,7 @@
   
   th {
     font-weight: bold;
-    text-align: left;
+    
     border-bottom: 2px solid var(--gray-300);
     color: var(--gray-300);
   }

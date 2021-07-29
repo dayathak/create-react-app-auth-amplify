@@ -11,12 +11,24 @@ import './App.css';
 import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react'
 import Amplify from 'aws-amplify';
 import aws_exports from './aws-exports';
+import {API, Auth} from 'aws-amplify';
 import CreateCase from './CreateCase';
 import ViewCase from './ViewCase';
 import MyCases from './MyCases';
 import Home from './Home';
 
 Amplify.configure(aws_exports);
+
+ 
+  let authuser= Auth.currentAuthenticatedUser();
+  const userid=authuser.username;
+  //let myuser = authuser.username;
+  console.log("myuser: " + userid);
+  Auth.currentAuthenticatedUser().then(user => console.log(user.username));
+ //console.log(Auth.currentSession().idToken);
+  Auth.currentSession().then(session => console.log(session.accessToken.jwtToken));
+
+
 
 
 class App extends Component {

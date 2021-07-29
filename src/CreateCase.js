@@ -5,6 +5,8 @@ import * as Yup from "yup";
 import styled from "@emotion/styled";
 import "./styles.css";
 import "./styles-custom.css";
+import {API, Auth} from 'aws-amplify';
+
 
 const MyTextInput = ({ label, ...props }) => {
   // useField() returns [formik.getFieldProps(), formik.getFieldMeta()]
@@ -20,6 +22,31 @@ const MyTextInput = ({ label, ...props }) => {
     </>
   );
 };
+
+
+       
+function postData(cases){
+  const apiName = 'casemanager';
+  const path = '/cases';
+  const myInit = { // OPTIONAL
+      body: JSON.stringify(cases), // case object to be posted
+      //headers: {}, // OPTIONAL
+  };
+
+  return  API.post(apiName, path, myInit);
+  alert("case created successfully")
+}
+
+function postData2(cases){
+  
+
+ 
+  fetch('https://g0dk99wgjb.execute-api.us-west-2.amazonaws.com/dev/cases', {
+    method: 'POST',
+    body: JSON.stringify(cases)
+  });
+
+}
 
 const MyCheckbox = ({ children, ...props }) => {
   const [field, meta] = useField({ ...props, type: "checkbox" });
@@ -74,11 +101,35 @@ const MySelect = ({ label, ...props }) => {
   );
 };
 
+async function getCurrentUser(values) {
+  let user = await Auth.currentAuthenticatedUser();
+   const userid = user.username;
+   console.log(userid);
+   
+   
+  
+  
+};
+
 export default class CreateCase extends React.Component {
   constructor(props) {
     super(props);
     this.state = {}
-  }
+  };
+/* async componentDidMount() {
+    try {
+        let sessionObject = await Auth.currentSession();
+        let tkn = sessionObject.accessToken.jwtToken;
+        let usr=sessionObject.idToken.payload.email;
+        let user = await Auth.currentAuthenticatedUser();
+        const userid = user.username;
+        console.log(userid);
+    } catch (e) {
+        alert(e);
+    }
+}*/
+
+
   
   
   render(){
@@ -86,14 +137,19 @@ export default class CreateCase extends React.Component {
       <>
       <h1>Create Case</h1>
       <Formik
+    
         initialValues={{
           caseid: "",
           type: "",
           description: "",
           status: "",
-          sla: "",
+          SLA: "",
           acceptedTerms: false, // added for our checkbox
-          priority: "" // added for our select
+          priority: "",
+          userid: "",
+          tenantid: "tenant1",
+          tenantname: "ABC Corp"
+
         }}
         validationSchema={Yup.object({
           caseid: Yup.string()
@@ -109,7 +165,15 @@ export default class CreateCase extends React.Component {
         })}
         onSubmit={async (values, { setSubmitting }) => {
           await new Promise(r => setTimeout(r, 500));
+          // values.tenantid="tenant2";
+          //alert(values.tenantid)
+          let user = await Auth.currentAuthenticatedUser();
+          const userid = user.username;
+          values.userid=userid;
+          postData2(values);
+          
           setSubmitting(false);
+          
         }}
       >
         <Form>
@@ -140,7 +204,7 @@ export default class CreateCase extends React.Component {
           />
           <MyTextInput
             label="SLA"
-            name="sla"
+            name="SLA"
             type="text"
             placeholder="SLA in days"
           />
