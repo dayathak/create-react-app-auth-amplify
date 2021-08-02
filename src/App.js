@@ -20,10 +20,7 @@ import Home from './Home';
 Amplify.configure(aws_exports);
 
  
-  let authuser= Auth.currentAuthenticatedUser();
-  const userid=authuser.username;
-  //let myuser = authuser.username;
-  console.log("myuser: " + userid);
+
   Auth.currentAuthenticatedUser().then(user => console.log(user.username));
  //console.log(Auth.currentSession().idToken);
   Auth.currentSession().then(session => console.log(session.accessToken.jwtToken));
@@ -54,17 +51,19 @@ class App extends Component {
             </li>
             <li>
               <NavLink to="/createcase" activeClassName="active">CreateCase</NavLink>
-            </li>                      
+            </li> 
+                     
           </ul>
         </nav>
 
         {/* A <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL. */}
         <Switch>
-        <Route exact path="/" exact component={Home}/>
+        <Route exact path="/"  component={Home}/>
           <Route exact path="/mycases" component={MyCases}/>
           <Route exact path="/viewcase" component={ViewCase}/>
           <Route exact path="/createcase" component={CreateCase} />
+          
         </Switch>
       </div>
     </Router>

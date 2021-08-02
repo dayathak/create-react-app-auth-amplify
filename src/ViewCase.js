@@ -1,4 +1,5 @@
 import React from 'react';
+import {API, Auth} from 'aws-amplify';
 
 export default class ViewCase extends React.Component {
   constructor(props) {
@@ -8,16 +9,32 @@ export default class ViewCase extends React.Component {
     }
   }
   
+
+  
   handleChange = (event)=>{
     this.setState({[event.target.name]: event.target.value});
   }
 
- handleSubmit = (event) => {
+ handleSubmit = async (event) => {
    event.preventDefault();
-   const caseid=this.state.caseid
+   const caseid=this.state.caseid;
+   let sessionObject =  await Auth.currentSession();
+   let tkn = sessionObject.idToken.jwtToken;
+   var bearertkn= "Bearer "+tkn;
+   let user =  Auth.currentAuthenticatedUser();
+   var tenantid=sessionObject.idToken.payload.website;
+   console.log(tenantid);
+   var myInit ={
+                headers: {
+                          'Content-Type': 'application/json',
+                          'Authorization': bearertkn
+                          }
+
+                }
+    console.log(myInit);
   
    // alert(caseid)
-    fetch ("https://g0dk99wgjb.execute-api.us-west-2.amazonaws.com/dev/cases?caseid="+caseid+"&tenantid=tenant1")
+    fetch ("https://g0dk99wgjb.execute-api.us-west-2.amazonaws.com/dev/cases?caseid="+caseid+"&tenantid="+tenantid, myInit)
     .then(res => res.json() )
     .then((data) => {
       this.setState({mycase: data})
@@ -35,6 +52,7 @@ export default class ViewCase extends React.Component {
             <h1>Enter Case ID to view</h1>
         <input type="text" id="caseid" name="caseid" placeholder="Case-xxxx" onChange={this.handleChange}></input>
         </label>
+        <br></br>
         <input type="submit" value="Submit"/>
         </form>
         <div>
@@ -54,14 +72,14 @@ export default class ViewCase extends React.Component {
                  </thead>
                  <tbody>
                         <tr>
-                           <td>{this.state.mycase.caseid}</td>
-                           <td>{this.state.mycase.tenantid}</td>
-                           <td>{this.state.mycase.tenantname}</td>
-                           <td>{this.state.mycase.username}</td>
-                           <td>{this.state.mycase.type}</td>
-                           <td>{this.state.mycase.priority}</td>
-                           <td>{this.state.mycase.status}</td>
-                           <td>{this.state.mycase.description}</td>
+                           <td style={{"border-bottom": "0px"}}>{this.state.mycase.caseid}</td>
+                           <td style={{"border-bottom": "0px"}}>{this.state.mycase.tenantid}</td>
+                           <td style={{"border-bottom": "0px"}}>{this.state.mycase.tenantname}</td>
+                           <td style={{"border-bottom": "0px"}}>{this.state.mycase.username}</td>
+                           <td style={{"border-bottom": "0px"}}>{this.state.mycase.type}</td>
+                           <td style={{"border-bottom": "0px"}}>{this.state.mycase.priority}</td>
+                           <td style={{"border-bottom": "0px"}}>{this.state.mycase.status}</td>
+                           <td style={{"border-bottom": "0px"}}>{this.state.mycase.description}</td>
                          </tr>
                  </tbody>
                </table>

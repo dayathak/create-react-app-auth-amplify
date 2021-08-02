@@ -1,8 +1,10 @@
 {
   "auth": {
-    "cognitocf0c6096": {
+    "createreactappauthamplify": {
       "service": "Cognito",
-      "providerPlugin": "awscloudformation"
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "customAuth": false
     }
   },
   "hosting": {

@@ -1,4 +1,6 @@
 import React, { useEffect } from "react";
+import { withRouter } from 'react-router';
+import { Redirect } from 'react-router';
 import ReactDOM from "react-dom";
 import { Formik, Form, useField, useFormikContext } from "formik";
 import * as Yup from "yup";
@@ -37,12 +39,16 @@ function postData(cases){
   alert("case created successfully")
 }
 
-function postData2(cases){
+function postData2(cases, token){
   
 
  
   fetch('https://g0dk99wgjb.execute-api.us-west-2.amazonaws.com/dev/cases', {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': token
+      },
     body: JSON.stringify(cases)
   });
 
@@ -111,10 +117,10 @@ async function getCurrentUser(values) {
   
 };
 
-export default class CreateCase extends React.Component {
+class CreateCase extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {}
+    this.state = {message: ""}
   };
 /* async componentDidMount() {
     try {
@@ -135,6 +141,8 @@ export default class CreateCase extends React.Component {
   render(){
     return (
       <>
+      
+     
       <h1>Create Case</h1>
       <Formik
     
@@ -147,8 +155,9 @@ export default class CreateCase extends React.Component {
           acceptedTerms: false, // added for our checkbox
           priority: "",
           userid: "",
-          tenantid: "tenant1",
-          tenantname: "ABC Corp"
+          tenantid: "",
+          tenantname: "",
+          message: ""
 
         }}
         validationSchema={Yup.object({
@@ -168,11 +177,26 @@ export default class CreateCase extends React.Component {
           // values.tenantid="tenant2";
           //alert(values.tenantid)
           let user = await Auth.currentAuthenticatedUser();
+          let sessionObject = await Auth.currentSession();
+          let tkn = sessionObject.idToken.jwtToken;
+          var bearertkn= "Bearer "+tkn;
           const userid = user.username;
+          var tenant_id=user.attributes.website;
+          console.log(tenant_id);
           values.userid=userid;
-          postData2(values);
-          
+          values.username=user.attributes.email;
+          values.tenantid=tenant_id;
+          values.tenantname = ((values.tenantid=='tenant1') ? 'ABC Corp' : 'XYZ Corp');
+
+          postData2(values, bearertkn);
+          //await alert("Case submitted");
+         values.message=(values.caseid +" has been created. Go to ViewCase tab for details.");
+         alert(values.caseid + " has been submitted");
+        this.state.message=values.message;
+
+          this.props.history.push('/createcase');
           setSubmitting(false);
+          
           
         }}
       >
@@ -221,10 +245,14 @@ export default class CreateCase extends React.Component {
           </MyCheckbox>
 
           <button type="submit">Submit</button>
+
         </Form>
       </Formik>
-    </>
+      <h5>{this.state.message}</h5>
+
+      </>
+    
     );
   }
 }
-
+export default withRouter(CreateCase);

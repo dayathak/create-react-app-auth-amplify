@@ -16,12 +16,25 @@ export default class MyCases extends React.Component {
   async componentDidMount() {
     try {
         let sessionObject = await Auth.currentSession();
-        //let tkn = sessionObject.idToken.jwtToken;
+        let tkn = sessionObject.idToken.jwtToken;
+        var bearertkn= "Bearer "+tkn;
         let usr=sessionObject.idToken.payload.email;
         let user = await Auth.currentAuthenticatedUser();
+        var groups = sessionObject.idToken.payload['cognito:groups'];
+        console.log(sessionObject);
+        console.log(user);
+        console.log(sessionObject.idToken.payload['cognito:groups']);
+        var myInit ={
+          headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': bearertkn
+                    }
+
+          }
+        
         const userid = user.username;
         console.log(userid);
-        const mycases = this.cases(userid);
+        const mycases = this.cases(userid, myInit);
         //this.setState({ mycases });
         //alert(usr);
     } catch (e) {
@@ -29,9 +42,9 @@ export default class MyCases extends React.Component {
     }
 }
 
-  cases(userid){
+  cases(userid, myInit){
     //let apinName = "casemanager";
-    fetch('https://g0dk99wgjb.execute-api.us-west-2.amazonaws.com/dev/cases/usercases?userid='+userid)
+    fetch('https://g0dk99wgjb.execute-api.us-west-2.amazonaws.com/dev/cases/usercases?userid='+userid, myInit)
     .then(res => res.json() )
     .then((data) => {
       this.setState({mycases: data})
